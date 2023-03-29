@@ -9,7 +9,6 @@ import Router, { useRouter } from "next/router";
 import { createTheme, createMuiTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@emotion/react";
 import SocketContextProvider from "../contexts/SocketContext";
-import PeerProvider from "../contexts/webRTC";
 
 const theme = createTheme({
   typography: {
@@ -19,12 +18,10 @@ const theme = createTheme({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <PeerProvider>
       <SocketContextProvider>
         <ThemeProvider theme={theme}>
           <Component {...pageProps} />
         </ThemeProvider>
       </SocketContextProvider>
-    </PeerProvider>
   );
 }

@@ -110,6 +110,55 @@ io.on("connection", (socket: Socket) => {
       socket.emit("deleteChatSuccessful", { chatWith: chatWith });
     }
   });
+
+
+
+
+
+  //video calling part
+  socket.on("joinRoom", (roomName) => {
+    const {rooms} = io.sockets.adapter;
+    const room = rooms.get(roomName);
+
+    //no such room
+    if(room==undefined){
+      socket.join(roomName);
+      socket.emit("roomCreated");
+    }else if(room.size==1){
+      socket.join(roomName);
+      socket.emit('roomJoined')
+    }else{
+      socket.emit('roomFull');
+    }
+  });
+
+  // Triggered when the person who joined the room is ready to communicate.
+  socket.on("readyToCommunicate", (roomName) => {
+    socket.broadcast.to(roomName).emit('readyToCommunicate');
+  });
+
+  // Triggered when server gets an icecandidate from a peer in the room.
+  socket.on("iceCandidate", (candidate, roomName: string) => {
+      socket.broadcast.to(roomName).emit('iceCandidate',candidate);
+  });
+
+  // Triggered when server gets an offer from a peer in the room.
+  socket.on("offer", (offer, roomName) => {
+    socket.broadcast.to(roomName).emit('offer',offer);
+  });
+
+  // Triggered when server gets an answer from a peer in the room
+  socket.on("answer", (answer, roomName) => {
+    socket.broadcast.to(roomName).emit('answer',answer);
+  });
+
+  socket.on("leave", (roomName) => {
+    console.log("left")
+    socket.leave(roomName);
+    socket.broadcast.to(roomName).emit('leave')
+  });
+
+
 });
 
 const handle = nextApp.getRequestHandler();

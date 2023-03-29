@@ -22,7 +22,15 @@ export interface ServerToClientEvents {
   msgDeleteSuccessful: (e: { messageId: string }) => void;
   deleteChatSuccessful: (e: { chatWith: string }) => void;
 
-
+  //video call
+  roomCreated: () => void;
+  roomJoined: () => void;
+  roomFull: () => void;
+  readyToCommunicate: () => void;
+  iceCandidate: (candidate: RTCIceCandidate) => void;
+  offer: (offer: RTCSessionDescriptionInit) => void;
+  answer: (answer: RTCSessionDescriptionInit) => void;
+  leave: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -53,6 +61,13 @@ export interface ClientToServerEvents {
 
   deleteChat: (e: { owner: string; chatWith: string }) => void;
 
+  //for videocall
+  joinRoom: (roomName: string) => void;
+  iceCandidate: (candidate: RTCIceCandidate, roomName: string) => void;
+  readyToCommunicate: (roomName: string) => void;
+  offer: (offer: RTCSessionDescriptionInit, roomName: string) => void;
+  answer: (offer: RTCSessionDescriptionInit, roomName: string) => void;
+  leave: (roomName: string) => void;
 }
 
 export interface InterServerEvents {
