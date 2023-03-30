@@ -21,6 +21,8 @@ import ChatMessage from "./ChatMessage";
 import { useRouter } from "next/router";
 import MapsUgcIcon from "@mui/icons-material/MapsUgc";
 import CircularProgress from "@mui/material/CircularProgress";
+import { v4 as uuidv4 } from "uuid";
+import VideocamIcon from "@mui/icons-material/Videocam";
 
 type ChatBoxProps = {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null;
@@ -37,7 +39,6 @@ const ChatBox = ({
   handleChatDelete,
   isFetching,
 }: ChatBoxProps) => {
-
   const [message, setMessage] = useState<string>("");
   const [chatMessages, setChatMessages] = useState<FetchedMessage[]>([]);
   const [userInfo, setUserInfo] = useState<{
@@ -156,6 +157,20 @@ const ChatBox = ({
     );
   }
 
+  const handleVideoCall = () => {
+    if (socket && router.query.message) {
+      const roomId = uuidv4();
+      socket.emit(
+        "videoCallUser",
+        router.query.message as string,
+        roomId,
+        user.username,
+        user._id
+      );
+      router.push("/videoCall/" + roomId);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -199,18 +214,33 @@ const ChatBox = ({
           }
           action={
             !isFetching ? (
-              <IconButton aria-label="settings">
-                <DeleteIcon
-                  onClick={() => {
-                    handleChatDelete(user._id, router.query.message as string);
-                  }}
-                />
-                {/* )} */}
-              </IconButton>
+              <div>
+                <IconButton aria-label="settings">
+                  <VideocamIcon
+                    fontSize="medium"
+                    onClick={() => {
+                      handleVideoCall();
+                    }}
+                  />
+                </IconButton>
+                <IconButton aria-label="settings">
+                  <DeleteIcon
+                    fontSize="medium"
+                    onClick={() => {
+                      handleChatDelete(user._id, router.query.message as string);
+                    }}
+                  />
+                </IconButton>
+              </div>
             ) : (
-              <IconButton aria-label="settings">
-               <CircularProgress />
-              </IconButton>
+              <div>
+                <IconButton aria-label="settings">
+                  <CircularProgress />
+                </IconButton>
+                <IconButton>
+                  <CircularProgress />
+                </IconButton>
+              </div>
             )
           }
           title={

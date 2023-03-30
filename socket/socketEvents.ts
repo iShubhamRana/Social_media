@@ -31,6 +31,17 @@ export interface ServerToClientEvents {
   offer: (offer: RTCSessionDescriptionInit) => void;
   answer: (answer: RTCSessionDescriptionInit) => void;
   leave: () => void;
+
+  //for videocall chatbox
+  newVideoMessage: (msg: string) => void;
+  videoMessageSucessfullySent: (msg: string) => void;
+  //present inside socket context
+  callReject: (reason: string) => void;
+  incomingVideoCall: (
+    roomName: string,
+    caller: string,
+    callerId: string
+  ) => void;
 }
 
 export interface ClientToServerEvents {
@@ -68,6 +79,16 @@ export interface ClientToServerEvents {
   offer: (offer: RTCSessionDescriptionInit, roomName: string) => void;
   answer: (offer: RTCSessionDescriptionInit, roomName: string) => void;
   leave: (roomName: string) => void;
+
+  //for videoCall chat box
+  sendVideoMessage: (msg: string, roomName: string) => void;
+  videoCallUser: (
+    userId: string,
+    roomName: string,
+    caller: string,
+    callerId: string
+  ) => void;
+  callReject:(userId:string)=>void
 }
 
 export interface InterServerEvents {

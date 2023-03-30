@@ -1,7 +1,17 @@
 import { useRouter } from "next/router";
 import { useEffect, useCallback, useState, useRef } from "react";
+import Box from "@mui/material/Box";
 import { useSocket } from "../../contexts/SocketContext";
-import ReactPlayer from "react-player";
+import classes from "./roomName.module.css";
+import IconButton from "@mui/material/IconButton";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import CallEndIcon from "@mui/icons-material/CallEnd";
+import VideoChat from "../../components/VideoChat";
+import useSnackbar from "../../customhooks/useSnackbar";
+import SnackbarComponent from "../../components/SnackBar";
 
 const ICE_SERVERS = {
   iceServers: [
@@ -24,6 +34,7 @@ const room = () => {
   const [showPeer, setShowPeer] = useState<boolean>(true);
   const [mic, setMic] = useState<boolean>(true);
   const [video, setVideo] = useState<boolean>(true);
+  const [focused, setFocused] = useState<boolean>(true); //if true , the other person's video is focused
 
   const { roomName } = router.query;
 
@@ -51,7 +62,7 @@ const room = () => {
     navigator.mediaDevices
       .getUserMedia({
         audio: true,
-        video: { width: 500, height: 500 },
+        video: true,
       })
       .then((stream) => {
         userStreamRef.current = stream;
@@ -175,6 +186,8 @@ const room = () => {
       rtcConnectionRef.current.close();
       rtcConnectionRef.current = null;
     }
+    socket.emit("leave", roomName as string);
+    router.push("/");
   };
 
   const leaveRoom = () => {
@@ -241,17 +254,110 @@ const room = () => {
   };
 
   return (
-    <div>
-      <video autoPlay ref={userVideoRef} />
-      <video
-        autoPlay
-        style={{ display: showPeer ? "inline-block" : "none" }}
-        ref={peerVideoRef}
-      />
-      <button onClick={toggleMic}>{mic ? "Mic on" : "Mic Off"}</button>
-      <button onClick={toggleVideo}>{video ? "Video on" : "Video off"}</button>
-      <button onClick={leaveRoom}>Leave room</button>
-    </div>
+    <Box
+      sx={{
+        m: 0,
+        p: 2,
+        height: "100vh",
+        width: "100vw",
+        display: "flex",
+        alignItems: "center",
+        background: "#434242",
+      }}
+    >
+      <Box
+        component="section"
+        id="call-section"
+        sx={{
+          width: "80%",
+          height: "100%",
+          m: 0,
+          p: 0,
+          position: "relative",
+        }}
+      >
+        <Box id="videoBox" sx={{ height: "100%", width: "100%", p: 0, m: 0 }}>
+          {" "}
+          <video
+            autoPlay
+            ref={userVideoRef}
+            className={!focused ? classes.focused : classes.notFocused}
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              if (focused) {
+                setFocused((prev) => !prev);
+              }
+            }}
+          />
+          <video
+            autoPlay
+            className={focused ? classes.focused : classes.notFocused}
+            ref={peerVideoRef}
+            onClick={() => {
+              if (!focused) {
+                setFocused((prev) => !prev);
+              }
+            }}
+          />
+          <Box
+            id="control-box"
+            sx={{
+              height: "10%",
+              width: "100%",
+              p: 0,
+              m: 0,
+              position: "absolute",
+              left: "0px",
+              bottom: "0px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <IconButton
+              onClick={toggleMic}
+              sx={{ m: 1, background: "#00000045", p: 2 }}
+            >
+              {mic ? (
+                <MicIcon sx={{ color: "white" }} fontSize="large" />
+              ) : (
+                <MicOffIcon sx={{ color: "white" }} fontSize="large" />
+              )}
+            </IconButton>
+            <IconButton
+              onClick={toggleVideo}
+              sx={{ m: 1, background: "#00000045", p: 2 }}
+            >
+              {video ? (
+                <VideocamIcon sx={{ color: "white" }} fontSize="large" />
+              ) : (
+                <VideocamOffIcon sx={{ color: "white" }} fontSize="large" />
+              )}
+            </IconButton>
+            <IconButton
+              onClick={leaveRoom}
+              sx={{ m: 1, background: "#00000045", p: 2 }}
+            >
+              <CallEndIcon sx={{ color: "red  " }} fontSize="large" />
+            </IconButton>
+          </Box>
+        </Box>
+      </Box>
+      <Box
+        component="section"
+        id="chat-section"
+        sx={{
+          width: "20%",
+          height: "100%",
+          p: 0,
+          m: 0,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <VideoChat />
+      </Box>
+    </Box>
   );
 };
 export default room;

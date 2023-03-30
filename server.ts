@@ -111,54 +111,78 @@ io.on("connection", (socket: Socket) => {
     }
   });
 
-
-
-
-
   //video calling part
   socket.on("joinRoom", (roomName) => {
-    const {rooms} = io.sockets.adapter;
+    const { rooms } = io.sockets.adapter;
     const room = rooms.get(roomName);
 
     //no such room
-    if(room==undefined){
+    if (room == undefined) {
       socket.join(roomName);
       socket.emit("roomCreated");
-    }else if(room.size==1){
+    } else if (room.size == 1) {
       socket.join(roomName);
-      socket.emit('roomJoined')
-    }else{
-      socket.emit('roomFull');
+      socket.emit("roomJoined");
+    } else {
+      socket.emit("roomFull");
     }
   });
 
   // Triggered when the person who joined the room is ready to communicate.
   socket.on("readyToCommunicate", (roomName) => {
-    socket.broadcast.to(roomName).emit('readyToCommunicate');
+    socket.broadcast.to(roomName).emit("readyToCommunicate");
   });
 
   // Triggered when server gets an icecandidate from a peer in the room.
   socket.on("iceCandidate", (candidate, roomName: string) => {
-      socket.broadcast.to(roomName).emit('iceCandidate',candidate);
+    socket.broadcast.to(roomName).emit("iceCandidate", candidate);
   });
 
   // Triggered when server gets an offer from a peer in the room.
   socket.on("offer", (offer, roomName) => {
-    socket.broadcast.to(roomName).emit('offer',offer);
+    socket.broadcast.to(roomName).emit("offer", offer);
   });
 
   // Triggered when server gets an answer from a peer in the room
   socket.on("answer", (answer, roomName) => {
-    socket.broadcast.to(roomName).emit('answer',answer);
+    socket.broadcast.to(roomName).emit("answer", answer);
   });
 
   socket.on("leave", (roomName) => {
-    console.log("left")
+    console.log("left");
     socket.leave(roomName);
-    socket.broadcast.to(roomName).emit('leave')
+    socket.broadcast.to(roomName).emit("leave");
   });
 
+  socket.on("sendVideoMessage", (msg, roomName) => {
+    socket.broadcast.to(roomName).emit("newVideoMessage", msg);
+    socket.emit("videoMessageSucessfullySent", msg);
+  });
 
+  socket.on("videoCallUser", (userId, roomName, caller, callerId) => {
+    console.log(userId, roomName, caller, callerId);
+    const receiverSocket = findConnectedUser(userId);
+    if (!receiverSocket) {
+      socket.emit("callReject", "User not online");
+    } else {
+      console.log("receiversocket",receiverSocket);
+      io.to(receiverSocket).emit(
+        "incomingVideoCall",
+        roomName,
+        caller,
+        callerId
+      );
+    }
+  });
+
+  socket.on("callReject", (userId) => {
+    const receiverSocket = findConnectedUser(userId);
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("callReject", "user rejected the call");
+    }
+  });
+
+  
 });
 
 const handle = nextApp.getRequestHandler();
