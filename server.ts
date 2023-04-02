@@ -165,7 +165,7 @@ io.on("connection", (socket: Socket) => {
     if (!receiverSocket) {
       socket.emit("callReject", "User not online");
     } else {
-      console.log("receiversocket",receiverSocket);
+      console.log("receiversocket", receiverSocket);
       io.to(receiverSocket).emit(
         "incomingVideoCall",
         roomName,
@@ -181,8 +181,6 @@ io.on("connection", (socket: Socket) => {
       io.to(receiverSocket).emit("callReject", "user rejected the call");
     }
   });
-
-  
 });
 
 const handle = nextApp.getRequestHandler();

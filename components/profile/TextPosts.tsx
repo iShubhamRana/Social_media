@@ -22,13 +22,14 @@ const TextPosts = (props: TextPostProps) => {
     axios
       .get("/api/posts/", { headers: { authorization: Token } })
       .then((res) => {
+        console.log(res.data);
         res.data = res.data.filter((e: FetchedPost) => e.picUrl === "");
         setPosts(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [posts]);
+  }, []);
 
   return (
     <Box

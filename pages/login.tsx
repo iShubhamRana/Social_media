@@ -15,6 +15,7 @@ import SimpleBackdrop from "../components/BackDrop";
 import { loginUser, setToken } from "../utilsServer/authUser";
 import UnprotectedLayout from "../components/UnprotectedLayout";
 import useSnackbar from "../customhooks/useSnackbar";
+import { useCallback } from "react";
 
 const Login = () => {
   /************************************************************************************************************************************* */
@@ -28,37 +29,48 @@ const Login = () => {
     useSnackbar();
   /***************************************************************************************************************************************/
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = useCallback(() => {
+    setShowPassword((show) => !show);
+  }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name,
-      value = e.target.value;
-    if (name === "email") setEmail(value);
-    else setPassword(value);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const name = e.target.name,
+        value = e.target.value;
+      if (name === "email") setEmail(value);
+      else setPassword(value);
 
-    if (Boolean(email) && Boolean(password)) {
-      setSubmitDisabled(false);
-    } else {
-      setSubmitDisabled(true);
-    }
-  };
+      if (Boolean(email) && Boolean(password)) {
+        setSubmitDisabled(false);
+      } else {
+        setSubmitDisabled(true);
+      }
+    },
+    [email, password]
+  );
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setisFetching(true);
-    loginUser(email, password)
-      .then((token) => {
-        setisFetching(false);
-        snackbarTrigger({ message: "Successfully Loggedin", type: "success" });
-        setToken(token);
-        setEmail("");
-        setPassword("");
-      })
-      .catch((err) => {
-        setisFetching(false);
-        snackbarTrigger({ message:"Invalid credentials", type: "error" });
-      });
-  };
+  const handleLogin = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setisFetching(true);
+      loginUser(email, password)
+        .then((token) => {
+          setisFetching(false);
+          snackbarTrigger({
+            message: "Successfully Loggedin",
+            type: "success",
+          });
+          setToken(token);
+          setEmail("");
+          setPassword("");
+        })
+        .catch((err) => {
+          setisFetching(false);
+          snackbarTrigger({ message: "Invalid credentials", type: "error" });
+        });
+    },
+    [email, password]
+  );
 
   return (
     <UnprotectedLayout>
@@ -159,7 +171,7 @@ const Login = () => {
             <Button
               variant="contained"
               color="info"
-              sx={{ width: "90%", p: 1 , mt:3 }}
+              sx={{ width: "90%", p: 1, mt: 3 }}
               type="submit"
               disabled={submitDisabled}
             >
@@ -167,7 +179,7 @@ const Login = () => {
             </Button>
             <Alert severity="info" sx={{ width: "90%", ml: 2 }}>
               <AlertTitle>
-                Forgot Password ? <Link href="/resetPassword">Click here</Link>
+                Forgot Password ? <Link href="/reset">Click here</Link>
               </AlertTitle>
             </Alert>
             <Alert severity="warning" sx={{ width: "90%", ml: 2 }}>

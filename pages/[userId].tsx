@@ -1,4 +1,4 @@
-import { useEffect, useState, SyntheticEvent } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FetchedUserObj from "../types/FetchedUserTypes";
 import fetchUser from "../utilsServer/fetchUser";
 import FetchedProfile from "../types/FetchedProfile";
@@ -26,6 +26,7 @@ interface TabPanelProps {
 }
 
 const ProfilePage = () => {
+  const router = useRouter();
   const [viewingUser, setViewingUser] = useState<FetchedUserObj | null>(null);
   const [profile, setProfile] = useState<FetchedProfile | null>(null);
 
@@ -37,7 +38,7 @@ const ProfilePage = () => {
     settabvalue(newValue);
   };
 
-  const fetchProfile = () => {
+  const fetchProfile = useCallback(() => {
     const Token = cookie.get("Token");
     // console.log(profile_user_id);
     axios
@@ -53,9 +54,8 @@ const ProfilePage = () => {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }, [router.query]);
 
-  const router = useRouter();
   useEffect(() => {
     if (!router.isReady) return;
     fetchProfile();
@@ -72,7 +72,7 @@ const ProfilePage = () => {
       <Layout user={viewingUser} isProtected={false}>
         {profile ? (
           <>
-            <Paper sx={{p:2}}>
+            <Paper sx={{ p: 2 }}>
               <Tabs
                 value={tabvalue}
                 onChange={handleChange}

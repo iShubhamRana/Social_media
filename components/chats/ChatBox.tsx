@@ -227,7 +227,10 @@ const ChatBox = ({
                   <DeleteIcon
                     fontSize="medium"
                     onClick={() => {
-                      handleChatDelete(user._id, router.query.message as string);
+                      handleChatDelete(
+                        user._id,
+                        router.query.message as string
+                      );
                     }}
                   />
                 </IconButton>

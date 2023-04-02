@@ -24,7 +24,7 @@ import ProfilePostDisplayer from "./ProfilePostDisplayer";
 import DoneIcon from "@mui/icons-material/Done";
 import follow from "../../utils/follow";
 import { Types } from "mongoose";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import unfollow from "../../utils/unfollow";
 import Backdrop from "../BackDrop";
@@ -33,7 +33,6 @@ import { io, Socket } from "socket.io-client";
 import cookie from "js-cookie";
 import { useRouter } from "next/router";
 import { Paper } from "@mui/material";
-
 
 type ProfileProps = {
   viewingUser: FetchedUserObj | null;
@@ -45,7 +44,7 @@ const Profile = (props: ProfileProps) => {
   const [fetching, setFetching] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleFollow = () => {
+  const handleFollow = useCallback(() => {
     if (!props.viewingUser) return;
     setFetching(true);
 
@@ -58,9 +57,9 @@ const Profile = (props: ProfileProps) => {
         console.log(err);
         setFetching(false);
       });
-  };
+  }, []);
 
-  const handleUnfollow = () => {
+  const handleUnfollow = useCallback(() => {
     if (!props.viewingUser) return;
     setFetching(true);
     unfollow(props.profileObj.profile.user._id)
@@ -72,9 +71,9 @@ const Profile = (props: ProfileProps) => {
         props.fetchProfile();
         setFetching(false);
       });
-  };
+  }, []);
 
-  const handleMessage = async () => {
+  const handleMessage = useCallback(async () => {
     const Token = cookie.get("Token");
     setFetching(true);
     await axios
@@ -97,7 +96,7 @@ const Profile = (props: ProfileProps) => {
         setFetching(false);
         console.log(err);
       });
-  };
+  }, []);
 
   return (
     <Box sx={{ width: "100%" }}>

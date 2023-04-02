@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FetchedUserObj from "../../types/FetchedUserTypes";
 import FetchedProfile from "../../types/FetchedProfile";
 import Paper from "@mui/material/Paper";
@@ -45,49 +45,70 @@ const Followers = (props: FollowingProps) => {
     following: { user: string }[];
   } | null>(null);
 
-  const handleFollow = (to: string) => {
+  const getViewingUserFollowStats = () => {
     if (!props.viewingUser) return;
-
-    follow(to)
-      .then((res) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        setisFetching(false);
-        snackbarTrigger({
-          message: "Followed successfully",
-          type: "success",
-        });
+    const Token = cookie.get("Token");
+    axios
+      .get(`${baseUrl}/api/profile/getfollowstats/${props.viewingUser._id}`, {
+        headers: {
+          Authorization: Token,
+        },
       })
-      .catch((err) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
+      .then((res) => {
+        setfollowstats(res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
-  const handleUnFollow = (to: string) => {
-    if (!props.viewingUser) return;
-    setisFetching(true);
-    unfollow(to)
-      .then((res) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        setisFetching(false);
-        snackbarTrigger({
-          message: "Unfollowed successfully",
-          type: "success",
-        });
-      })
-      .catch((err) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
-  };
+  const handleFollow = useCallback(
+    (to: string) => {
+      if (!props.viewingUser) return;
 
-  const getfollowers = () => {
+      follow(to)
+        .then((res) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          setisFetching(false);
+          snackbarTrigger({
+            message: "Followed successfully",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
+        });
+    },
+    [getViewingUserFollowStats]
+  );
+
+  const handleUnFollow = useCallback(
+    (to: string) => {
+      if (!props.viewingUser) return;
+      setisFetching(true);
+      unfollow(to)
+        .then((res) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          setisFetching(false);
+          snackbarTrigger({
+            message: "Unfollowed successfully",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
+        });
+    },
+    [getViewingUserFollowStats]
+  );
+
+  const getfollowers = useCallback(() => {
     const Token = cookie.get("Token");
     axios
       .get(
@@ -104,27 +125,12 @@ const Followers = (props: FollowingProps) => {
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const getViewingUserFollowStats = () => {
-    if (!props.viewingUser) return;
-    const Token = cookie.get("Token");
-    axios
-      .get(`${baseUrl}/api/profile/getfollowstats/${props.viewingUser._id}`, {
-        headers: {
-          Authorization: Token,
-        },
-      })
-      .then((res) => {
-        setfollowstats(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, []);
 
   useEffect(() => {
     getfollowers();
     getViewingUserFollowStats();
-  }, []);
+  }, [getfollowers, getViewingUserFollowStats]);
 
   // console.log(!followers || (props.viewingUser && !followstats);
 

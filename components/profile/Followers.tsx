@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FetchedUserObj from "../../types/FetchedUserTypes";
 import FetchedProfile from "../../types/FetchedProfile";
 import Paper from "@mui/material/Paper";
@@ -46,48 +46,69 @@ const Followers = (props: FollowerProps) => {
     following: { user: string }[];
   } | null>(null);
 
-  const handleFollow = (to: string) => {
+  const getViewingUserFollowStats = useCallback(() => {
     if (!props.viewingUser) return;
-
-    setisFetching(true);
-    follow(to)
-      .then((res) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        snackbarTrigger({
-          message: "Followed successfully",
-          type: "success",
-        });
-        setisFetching(false);
+    const Token = cookie.get("Token");
+    axios
+      .get(`${baseUrl}/api/profile/getfollowstats/${props.viewingUser._id}`, {
+        headers: {
+          Authorization: Token,
+        },
       })
-      .catch((err) => {
-        setisFetching(false);
-        snackbarTrigger({ message: "Error occurred", type: "error" });
-      });
-  };
-
-  const handleUnFollow = (to: string) => {
-    if (!props.viewingUser) return;
-    setisFetching(true);
-
-    unfollow(to)
       .then((res) => {
-        props.fetchProfile();
-        getViewingUserFollowStats();
-        setisFetching(false);
-        snackbarTrigger({
-          message: "Unfollowed successfully",
-          type: "success",
-        });
+        setfollowstats(res.data);
       })
-      .catch((err) => {
-        props.fetchProfile();
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
-  };
+      .catch((err) => console.log(err));
+  }, []);
 
-  const getfollowers = () => {
+  const handleFollow = useCallback(
+    (to: string) => {
+      if (!props.viewingUser) return;
+
+      setisFetching(true);
+      follow(to)
+        .then((res) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          snackbarTrigger({
+            message: "Followed successfully",
+            type: "success",
+          });
+          setisFetching(false);
+        })
+        .catch((err) => {
+          setisFetching(false);
+          snackbarTrigger({ message: "Error occurred", type: "error" });
+        });
+    },
+    [getViewingUserFollowStats]
+  );
+
+  const handleUnFollow = useCallback(
+    (to: string) => {
+      if (!props.viewingUser) return;
+      setisFetching(true);
+
+      unfollow(to)
+        .then((res) => {
+          props.fetchProfile();
+          getViewingUserFollowStats();
+          setisFetching(false);
+          snackbarTrigger({
+            message: "Unfollowed successfully",
+            type: "success",
+          });
+        })
+        .catch((err) => {
+          props.fetchProfile();
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
+        });
+    },
+    [getViewingUserFollowStats]
+  );
+
+  const getfollowers = useCallback(() => {
     const Token = cookie.get("Token");
     axios
       .get(
@@ -104,22 +125,7 @@ const Followers = (props: FollowerProps) => {
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const getViewingUserFollowStats = () => {
-    if (!props.viewingUser) return;
-    const Token = cookie.get("Token");
-    axios
-      .get(`${baseUrl}/api/profile/getfollowstats/${props.viewingUser._id}`, {
-        headers: {
-          Authorization: Token,
-        },
-      })
-      .then((res) => {
-        setfollowstats(res.data);
-      })
-      .catch((err) => console.log(err));
-  };
+  }, []);
 
   useEffect(() => {
     getfollowers();

@@ -1,5 +1,5 @@
 import FetchedPostObj from "../types/FetchedPost";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -38,7 +38,7 @@ const PostCard = (props: PostcardProps) => {
     if (check) setIsLiked(true);
   }, []);
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     setIsLiked((prev) => !prev);
 
     const Token = cookie.get("Token");
@@ -54,12 +54,12 @@ const PostCard = (props: PostcardProps) => {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }, []);
 
-  const pushToPost = () => {
+  const pushToPost = useCallback(() => {
     window.scroll({ top: 0 });
     setShowModal(true);
-  };
+  }, []);
 
   return (
     <>
@@ -70,7 +70,7 @@ const PostCard = (props: PostcardProps) => {
       )}
       <Card
         sx={{
-          width: "95%",
+          width: "100%",
           height: "fit-content",
           p: 2,
           borderRadius: "10px",
@@ -82,7 +82,7 @@ const PostCard = (props: PostcardProps) => {
       >
         {" "}
         <CardHeader
-          sx={{ height: "3rem" }}
+          sx={{ height: "3rem", mb: 1 }}
           avatar={<Avatar alt="Ted talk" src={props.post.user.profilePicUrl} />}
           action={
             <IconButton aria-label="settings">

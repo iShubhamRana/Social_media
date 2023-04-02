@@ -113,6 +113,7 @@ const Notifications = (props: NotificationProps) => {
             maxHeight: "70vh",
             overflowY: "auto",
             overflowX: "hidden",
+            border:"1px solid lightgrey"
           }}
         >
           {/* <Typography
@@ -133,6 +134,7 @@ const Notifications = (props: NotificationProps) => {
             Notifications
           </Typography> */}
           {!notifications && <CircularProgress />}
+          {notifications && notifications.length===0 && <Typography variant="h5">No Notifications</Typography>}
           {notifications && (
             <List dense={true}>
               {notifications.map((notification) => {

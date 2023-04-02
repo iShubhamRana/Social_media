@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import FetchedUserObj from "../../types/FetchedUserTypes";
 import FetchedProfile from "../../types/FetchedProfile";
 import Box from "@mui/material/Box";
@@ -52,11 +52,14 @@ const Settings = (props: ProfileProps) => {
     useSnackbar();
   const [isFetching, setisFetching] = useState<boolean>(false);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswords((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasswords((prev) => {
+        return { ...prev, [e.target.name]: e.target.value };
+      });
+    },
+    []
+  );
 
   useEffect(() => {
     if (
@@ -71,60 +74,70 @@ const Settings = (props: ProfileProps) => {
     }
   }, [passwords]);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const Token = cookie.get("Token");
+  const handlePasswordSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const Token = cookie.get("Token");
 
-    setisFetching(true);
+      setisFetching(true);
 
-    axios
-      .put(
-        `${baseUrl}/api/profile/changePassword`,
-        {
-          ...passwords,
-        },
-        {
-          headers: {
-            Authorization: Token,
+      axios
+        .put(
+          `${baseUrl}/api/profile/changePassword`,
+          {
+            ...passwords,
           },
-        }
-      )
-      .then((res) => {
-        setisFetching(false);
-        snackbarTrigger({ message: res.data, type: "success" });
-        setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
-      })
-      .catch((err) => {
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
-  };
+          {
+            headers: {
+              Authorization: Token,
+            },
+          }
+        )
+        .then((res) => {
+          setisFetching(false);
+          snackbarTrigger({ message: res.data, type: "success" });
+          setPasswords({
+            oldPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        })
+        .catch((err) => {
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
+        });
+    },
+    [passwords]
+  );
 
-  const handleMessageToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const allowed = e.target.checked;
-    const Token = cookie.get("Token");
-    setisFetching(true);
-    axios
-      .put(
-        `${baseUrl}/api/profile/allowPopup`,
-        {
-          allowed,
-        },
-        {
-          headers: {
-            Authorization: Token,
+  const handleMessageToggle = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const allowed = e.target.checked;
+      const Token = cookie.get("Token");
+      setisFetching(true);
+      axios
+        .put(
+          `${baseUrl}/api/profile/allowPopup`,
+          {
+            allowed,
           },
-        }
-      )
-      .then((res) => {
-        setisFetching(false);
-        snackbarTrigger({ message: res.data, type: "success" });
-      })
-      .catch((err) => {
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
-  };
+          {
+            headers: {
+              Authorization: Token,
+            },
+          }
+        )
+        .then((res) => {
+          setisFetching(false);
+          snackbarTrigger({ message: res.data, type: "success" });
+        })
+        .catch((err) => {
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
+        });
+    },
+    []
+  );
 
   return (
     <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>

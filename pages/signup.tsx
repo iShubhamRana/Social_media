@@ -5,7 +5,6 @@ import Stack from "@mui/material/Stack";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import KeyIcon from "@mui/icons-material/Key";
 import Button from "@mui/material/Button";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EmailIcon from "@mui/icons-material/Email";
@@ -16,8 +15,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import { Container, Paper } from "@mui/material";
+import { useRouter } from "next/router";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import axios from "axios";
 import baseUrl from "../utilsServer/base";
@@ -44,8 +45,9 @@ const Signup = () => {
 
   const [usernameState, setUsernameState] = useState<
     "ABSENT" | "FETCHING" | "VALID" | "INVALID"
-  >("VALID");
+  >("ABSENT");
 
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const [submitDisabled, setSubmitDisabled] = useState<boolean>(true);
@@ -63,16 +65,22 @@ const Signup = () => {
     setSubmitDisabled(!validUser);
   }, [User]);
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword = useCallback(
+    () => setShowPassword((show) => !show),
+    []
+  );
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    SetUser((prev) => {
-      return {
-        ...prev,
-        [e.target.name]: e.target.value,
-      };
-    });
-  };
+  const handleFormChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      SetUser((prev) => {
+        return {
+          ...prev,
+          [e.target.name]: e.target.value,
+        };
+      });
+    },
+    []
+  );
 
   useEffect(() => {
     if (User.username) {
@@ -99,49 +107,57 @@ const Signup = () => {
     }
   }, [User.username]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setMedia(e.target.files[0]);
       setMediaPreview(URL.createObjectURL(e.target.files[0]));
     }
-  };
+  }, []);
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setisFetching(true);
+  const handleRegister = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setisFetching(true);
 
-    let profilePicUrl: string | null = null;
+      let profilePicUrl: string | null = "*";
 
-    if (media !== null) {
-      profilePicUrl = await uploadPic(media);
-    }
+      if (media !== null) {
+        profilePicUrl = await uploadPic(media);
+      }
 
-    if (media && !profilePicUrl) return;
+      if (media && !profilePicUrl) return;
 
-    //api call
+      //api call
 
-    axios
-      .post(`${baseUrl}/api/signup`, {
-        user: { ...User, profilePicUrl },
-      })
-      .then((res) => {
-        setisFetching(false);
-        snackbarTrigger({ message: "Successfully Signedup", type: "success" });
-        SetUser({
-          name: "",
-          email: "",
-          username: "",
-          password: "",
-          profilePicUrl: "",
+      axios
+        .post(`${baseUrl}/api/signup`, {
+          user: { ...User, profilePicUrl },
+        })
+        .then((res) => {
+          setisFetching(false);
+          snackbarTrigger({
+            message: "Successfully Signedup",
+            type: "success",
+          });
+          SetUser({
+            name: "",
+            email: "",
+            username: "",
+            password: "",
+            profilePicUrl: "*",
+          });
+          setMedia(null);
+          setToken(res.data);
+          router.push("/home");
+        })
+        .catch((err) => {
+          setisFetching(false);
+          snackbarTrigger({ message: err.response.data, type: "error" });
         });
-        setMedia(null);
-        setToken(res.data);
-      })
-      .catch((err) => {
-        setisFetching(false);
-        snackbarTrigger({ message: err.response.data, type: "error" });
-      });
-  };
+    },
+
+    [media, User]
+  );
 
   return (
     <UnprotectedLayout>
@@ -160,7 +176,7 @@ const Signup = () => {
             alignItems: "center",
           }}
         >
-          <Stack
+          <Paper
             sx={{
               width: "80%",
               margin: "auto",
@@ -173,15 +189,14 @@ const Signup = () => {
               pl: 2,
               pr: 2,
               pb: 5,
-              borderRadius: 5,
-              border: "1px solid grey",
+              borderRadius: "10px",
+              border: "1px solid lightgrey",
             }}
-            spacing={3}
           >
             <Alert
               severity="info"
               icon={<SettingsIcon fontSize="large" />}
-              sx={{ width: "95%", ml: 2 }}
+              sx={{ width: "95%", ml: 2, mb: 2 }}
             >
               <AlertTitle>Get Started !!</AlertTitle>
               <strong>Create an Account</strong>
@@ -229,6 +244,7 @@ const Signup = () => {
                 display: "flex",
                 alignItems: "flex-end",
                 width: "90%",
+                m: 1,
               }}
             >
               <EmailIcon sx={{ color: "action.active", mr: 1 }} />
@@ -249,6 +265,7 @@ const Signup = () => {
                 display: "flex",
                 alignItems: "flex-end",
                 width: "90%",
+                m: 1,
               }}
             >
               {showPassword ? (
@@ -280,6 +297,7 @@ const Signup = () => {
                 display: "flex",
                 alignItems: "flex-end",
                 width: "90%",
+                m: 1,
               }}
             >
               <AlternateEmailIcon sx={{ color: "action.active", mr: 1 }} />
@@ -308,7 +326,7 @@ const Signup = () => {
             <Button
               variant="contained"
               color="info"
-              sx={{ width: "90%", p: 1, mt: 5 }}
+              sx={{ width: "90%", p: 1, mt: 5, m: 2 }}
               disabled={submitDisabled || usernameState !== "VALID"}
               type="submit"
             >
@@ -320,7 +338,7 @@ const Signup = () => {
                 Already have an account? <Link href="/login">Login here</Link>{" "}
               </AlertTitle>
             </Alert>
-          </Stack>
+          </Paper>
         </FormControl>
       </form>
     </UnprotectedLayout>

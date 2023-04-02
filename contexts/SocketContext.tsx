@@ -39,7 +39,7 @@ const SocketContextProvider = (props: SocketContextProviderProp) => {
     });
     socket.on("incomingVideoCall", (roomName, caller, callerId) => {
       if (
-       window.confirm(
+        window.confirm(
           `${caller} is inviting you for a videocall. Would you like to Join?`
         )
       ) {

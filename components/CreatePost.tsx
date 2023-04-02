@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import ProtectedRouteProps from "../types/ProtectedRouteProps";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -49,21 +49,24 @@ const CreatePost = (props: CreatePostProps) => {
   const [highlighted, setHighlighted] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setMedia(e.target.files[0]);
       setMediaPreview(URL.createObjectURL(e.target.files[0]));
     }
-  };
+  }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPostData((prev) => {
-      return {
-        ...prev,
-        [e.target.name]: e.target.value,
-      };
-    });
-  };
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPostData((prev) => {
+        return {
+          ...prev,
+          [e.target.name]: e.target.value,
+        };
+      });
+    },
+    []
+  );
   //ends here
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,10 +105,10 @@ const CreatePost = (props: CreatePostProps) => {
       });
   };
 
-  const handlereset = () => {
+  const handlereset = useCallback(() => {
     setPostData(initialPostData);
     setShowAdditional(false);
-  };
+  }, []);
 
   return (
     <Paper

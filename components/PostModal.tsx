@@ -1,5 +1,5 @@
 import FetchedPostObj from "../types/FetchedPost";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -12,7 +12,6 @@ import Box from "@mui/material/Box";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import TelegramIcon from "@mui/icons-material/Telegram";
 import FetchedUserObj from "../types/FetchedUserTypes";
 import baseUrl from "../utilsServer/base";
 import { red } from "@mui/material/colors";
@@ -25,6 +24,10 @@ import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Message from "../types/MessageType";
 import SnackBar from "./SnackBar";
+import { Paper } from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import TelegramIcon from "@mui/icons-material/Telegram";
 
 type PostcardProps = {
   postId: string;
@@ -92,7 +95,7 @@ const PostModal = (props: PostcardProps) => {
     type: "success",
   });
 
-  const fetchPost = () => {
+  const fetchPost = useCallback(() => {
     const Token = cookie.get("Token");
 
     axios
@@ -110,7 +113,7 @@ const PostModal = (props: PostcardProps) => {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }, []);
 
   useEffect(() => {
     fetchPost();
@@ -146,7 +149,8 @@ const PostModal = (props: PostcardProps) => {
       });
   };
 
-  const handleComment = () => {
+  const handleComment = (e:React.FormEvent) => {
+    e.preventDefault();
     if (!props.user) {
       setShowSnackbar(true);
       setMessage({
@@ -220,16 +224,16 @@ const PostModal = (props: PostcardProps) => {
         message={message.message}
         behaviour={message.type}
       />
-      <Box
+      <Paper
         sx={{
           width: "60%",
-          boxShadow: "0px 0px 2px black",
           zIndex: 1000,
           position: "absolute",
           left: "20%",
-          height: "70%",
+          height: "75vh",
           top: "15%",
           display: "flex",
+          border: "1px solid lightgrey",
         }}
         // id="parent"
         component="div"
@@ -242,13 +246,13 @@ const PostModal = (props: PostcardProps) => {
                 ml: "auto",
                 mr: "auto",
                 height: "100%",
-                boxShadow: "0px 0px 2px black",
+                border: "1px solid lightgrey",
               }}
               style={{ fontSize: "20px" }}
             >
               {" "}
               <CardHeader
-                sx={{ height: "3rem" }}
+                sx={{ height: "10%", m: 1 }}
                 avatar={<Avatar alt="Ted talk" src={post.user.profilePicUrl} />}
                 action={
                   <IconButton aria-label="settings">
@@ -271,12 +275,12 @@ const PostModal = (props: PostcardProps) => {
                   sx={{
                     ml: "auto",
                     mr: "auto",
-                    height: "30rem",
+                    height: "75%",
                     cursor: "pointer",
                   }}
                 />
               )}
-              <CardContent sx={{ height: "70px" }}>
+              <CardContent sx={{ height: "15%" }}>
                 <Typography
                   variant="body2"
                   color="text.primary"
@@ -315,7 +319,6 @@ const PostModal = (props: PostcardProps) => {
             <div
               style={{
                 width: "40%",
-                boxShadow: "0px 0px 2px black",
                 background: "white",
                 height: "100%",
               }}
@@ -323,7 +326,7 @@ const PostModal = (props: PostcardProps) => {
               <div
                 style={{
                   width: "100%",
-                  height: "90%",
+                  height: "85%",
                   overflowY: "scroll",
                   overflowX: "hidden",
                 }}
@@ -339,36 +342,44 @@ const PostModal = (props: PostcardProps) => {
                 })}
               </div>
 
-              <div
+              <form
                 style={{
                   width: "100%",
-                  height: "10%",
+                  height: "15%",
                   display: "flex",
-                  justifyContent: "end",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
+                onSubmit={handleComment}
               >
-                <input
+                <TextField
+                  type="text"
                   value={comment}
-                  style={{ width: "80%", border: "none" }}
-                  placeholder="Add Comment"
-                  onChange={(e) => {
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setComment(e.target.value);
                   }}
+                  sx={{ height: "50%", width: "95%", m: 0, p: 0 }}
+                  placeholder={"Add comment"}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton type="submit" disabled={!message}>
+                          <TelegramIcon
+                            color={message ? "primary" : "disabled"}
+                            fontSize="large"
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-                <Button
-                  style={{ width: "20%" }}
-                  variant="outlined"
-                  onClick={handleComment}
-                >
-                  Comment
-                </Button>
-              </div>
+              </form>
             </div>
           </>
         ) : (
           <PostModalLoadingSkeleton />
         )}
-      </Box>
+      </Paper>
     </>
   );
 };

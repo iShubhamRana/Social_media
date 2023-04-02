@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import UnprotectedLayout from "../../components/UnprotectedLayout";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import { Container } from "@mui/material";
+import { Container,Paper } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -73,7 +73,7 @@ const TokenPage = () => {
           message={message.message}
           behaviour={message.type}
         />
-        <Container
+        <Paper
           sx={{
             display: "flex",
             justifyContent: "center",
@@ -81,7 +81,8 @@ const TokenPage = () => {
             width: "80%",
             margin: "auto",
             flexDirection: "column",
-            border: "1px solid grey",
+            border: "1px solid lightgrey",
+            borderRadius:"10px",
             p: 5,
           }}
         >
@@ -165,7 +166,7 @@ const TokenPage = () => {
           >
             Update password
           </Button>
-        </Container>
+        </Paper>
       </form>
     </UnprotectedLayout>
   );

@@ -22,7 +22,7 @@ function Media() {
           <Skeleton
             animation="wave"
             height={"20%"}
-            width="80%"
+            width="100%"
             style={{ marginBottom: 6 }}
           />
         }

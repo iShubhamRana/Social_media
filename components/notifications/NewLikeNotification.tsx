@@ -5,6 +5,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import Router from "next/router";
 import calculateTime from "../../utilsServer/calculateTime";
+import Link from "next/link"
 
 const NewLikeNotification = (notification: NotificationElement) => {
   return (

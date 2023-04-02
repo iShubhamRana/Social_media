@@ -88,7 +88,7 @@ export interface ClientToServerEvents {
     caller: string,
     callerId: string
   ) => void;
-  callReject:(userId:string)=>void
+  callReject: (userId: string) => void;
 }
 
 export interface InterServerEvents {

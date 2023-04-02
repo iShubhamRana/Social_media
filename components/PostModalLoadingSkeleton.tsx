@@ -14,7 +14,7 @@ const PostModal = () => {
     <Box
       sx={{
         width: "100%",
-        height: "100%",
+        height: "75vh",
         display: "flex",
       }}
       // id="parent"
@@ -32,7 +32,7 @@ const PostModal = () => {
       >
         {" "}
         <CardHeader
-          sx={{ height: "3rem" }}
+          sx={{ height: "10%" , mb:1 }}
           avatar={
             <Skeleton
               animation="wave"
@@ -56,7 +56,7 @@ const PostModal = () => {
           }
         />
         <Skeleton
-          sx={{ height: "500px" }}
+          sx={{ height: "80%" }}
           animation="wave"
           variant="rectangular"
         />

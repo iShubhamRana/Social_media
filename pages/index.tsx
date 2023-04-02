@@ -80,7 +80,7 @@ export default function Home(props: HomeProps) {
     return () => {
       socket.off("newMessageReceived");
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     setFetching(true);

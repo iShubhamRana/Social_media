@@ -52,7 +52,6 @@ router.post("/", async (req: Request, res: Response) => {
     if (user) {
       return res.status(401).send("Email already taken");
     }
-
     const newUser = new UserModal({
       name: User.name,
       email: User.email.toLowerCase(),

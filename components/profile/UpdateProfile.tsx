@@ -1,17 +1,14 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Paper from "@mui/material/Paper";
 import FetchedUserObj from "../../types/FetchedUserTypes";
 import FetchedProfile from "../../types/FetchedProfile";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import { Box, useForkRef } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import UpgradeIcon from "@mui/icons-material/Upgrade";
-import ProfilePostDisplayer from "./ProfilePostDisplayer";
 import Backdrop from "../BackDrop";
 import useSnackbar from "../../customhooks/useSnackbar";
 import SnackbarComponent from "../../components/SnackBar";
@@ -49,12 +46,12 @@ const UpdateProfile = (props: ProfileProps) => {
 
   const [media, setMedia] = useState<File | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // setprofile((prev)=>{...prev , [e.target.name]:e.target.value});
     setprofile((prev) => {
       return { ...prev, [e.target.name]: e.target.value };
     });
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +92,7 @@ const UpdateProfile = (props: ProfileProps) => {
       });
   };
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setMedia(e.target.files[0]);
       const url = URL.createObjectURL(e.target.files[0]);
@@ -103,7 +100,7 @@ const UpdateProfile = (props: ProfileProps) => {
         return { ...prev, ["profilepic"]: url };
       });
     }
-  };
+  }, []);
 
   const [fetching, setFetching] = useState<boolean>(false);
 
