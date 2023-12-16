@@ -118,9 +118,10 @@ const NewMessageModel = (props: newMessageContentType) => {
           date={props.message.date}
         />
 
-        {messages.map((currMessage) => {
+        {messages.map((currMessage , key) => {
           return (
             <ChatMessage
+            key={key}
               messageId={currMessage._id}
               text={currMessage.msg}
               profilePic={""}

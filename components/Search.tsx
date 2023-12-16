@@ -132,6 +132,7 @@ const Search = (props: ProtectedRouteProps) => {
                     name={user.name}
                     profilePicUrl={user.profilePicUrl as string}
                     index={index}
+                    key={index}
                   ></UserTemplate>
                 );
               }

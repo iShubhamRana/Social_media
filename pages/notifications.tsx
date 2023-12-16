@@ -137,13 +137,13 @@ const Notifications = (props: NotificationProps) => {
           {notifications && notifications.length===0 && <Typography variant="h5">No Notifications</Typography>}
           {notifications && (
             <List dense={true}>
-              {notifications.map((notification) => {
+              {notifications.map((notification , key) => {
                 if (notification.type === "newLike") {
-                  return <NewLikeNotification {...notification} />;
+                  return <NewLikeNotification key={key} {...notification} />;
                 } else if (notification.type === "newComment") {
-                  return <NewCommentNotification {...notification} />;
+                  return <NewCommentNotification key={key} {...notification} />;
                 } else {
-                  return <NewFollowNotification {...notification} />;
+                  return <NewFollowNotification key={key} {...notification} />;
                 }
               })}
             </List>

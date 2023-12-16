@@ -265,7 +265,7 @@ const ChatBox = ({
         ref={divRef}
         style={{ scrollbarWidth: "thin" }}
       >
-        {chatMessages.map((message) => {
+        {chatMessages.map((message , key) => {
           return (
             <ChatMessage
               messageId={message._id}
@@ -274,6 +274,7 @@ const ChatBox = ({
               wasSent={user._id === message.sender}
               date={message.date}
               handleMessageDelete={handleMessageDelete}
+              key={key}
             ></ChatMessage>
           );
         })}

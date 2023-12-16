@@ -331,9 +331,10 @@ const PostModal = (props: PostcardProps) => {
                   overflowX: "hidden",
                 }}
               >
-                {post.comments.map((comment) => {
+                {post.comments.map((comment , key) => {
                   return (
                     <CommentDisplayer
+                       key={key}
                       comment={comment}
                       user={props.user}
                       deleteComment={deleteComment}

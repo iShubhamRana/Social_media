@@ -93,8 +93,8 @@ const Chat = () => {
         sx={{ height: "90%", overflow: "auto" }}
         ref={divRef}
       >
-        {chatMessages.map((msg) => {
-          return <Message msg={msg} />;
+        {chatMessages.map((msg , key) => {
+          return <Message msg={msg} key={key} />;
         })}
       </Box>
       <Box

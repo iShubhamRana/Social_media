@@ -21,7 +21,7 @@ const ICE_SERVERS = {
   ],
 };
 
-const room = () => {
+const Room = () => {
   const router = useRouter();
   const socket = useSocket().socket.socket;
   const rtcConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -360,4 +360,4 @@ const room = () => {
     </Box>
   );
 };
-export default room;
+export default Room;
